@@ -43,32 +43,6 @@ export default function Profile() {
     }
   };
 
-  // Add your Cloudinary details here
-  const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/<your-cloud-name>/image/upload';
-  const CLOUDINARY_UPLOAD_PRESET = '<your-upload-preset>';
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    try {
-      const res = await fetch(CLOUDINARY_URL, {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-      if (data.secure_url) {
-        setForm(f => ({ ...f, profilePic: data.secure_url }));
-      } else {
-        setError('Image upload failed.');
-      }
-    } catch (err) {
-      setError('Image upload failed.');
-    }
-  };
-
   if (!userData) return <div>Loading...</div>;
 
   return (
@@ -95,10 +69,6 @@ export default function Profile() {
               <label htmlFor="profilePic">Profile Picture URL</label>
               <div className="field">
                 <input className="input-field" id="profilePic" type="text" name="profilePic" value={form.profilePic} onChange={handleChange} placeholder="Profile Pic URL" />
-              </div>
-              <label htmlFor="avatarUpload">Or Upload New Avatar</label>
-              <div className="field">
-                <input type="file" id="avatarUpload" accept="image/*" onChange={handleFileChange} style={{color:'#d3d3d3',background:'none',border:'none'}} />
               </div>
               <button className="btn" type="submit">Save</button>
               <button className="btn" type="button" onClick={() => { setEditing(false); setForm({ name: userData.name, bio: userData.bio, profilePic: userData.profilePic }); setError(''); }}>Cancel</button>

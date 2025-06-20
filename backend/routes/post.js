@@ -43,4 +43,21 @@ router.post('/:id/like', auth, async (req, res) => {
   }
 });
 
+// Dislike a post
+router.post('/:id/dislike', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    if (post.dislikedBy.includes(req.user.id)) {
+      return res.status(400).json({ message: 'You have already disliked this post' });
+    }
+    post.dislikedBy.push(req.user.id);
+    post.dislikeCount += 1;
+    await post.save();
+    res.json({ dislikeCount: post.dislikeCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;
