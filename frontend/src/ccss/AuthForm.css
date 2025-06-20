@@ -1,0 +1,103 @@
+.card {
+  width: 100%;
+  max-width: 340px;
+  margin: 2rem auto;
+  padding: 2.2rem 1.5rem;
+  text-align: center;
+  background: #2a2b38;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px 0 rgb(16 39 112 / 10%);
+}
+
+/*Inputs*/
+.field {
+  margin-top: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  background-color: #1f2029;
+  border-radius: 4px;
+  padding: .7em 1em;
+}
+
+.input-icon {
+  height: 1.2em;
+  width: 1.2em;
+  fill: #ffeba7;
+}
+
+.input-field {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: #d3d3d3;
+  font-size: 1em;
+  padding: 0.5em 0;
+}
+
+/*Text*/
+.title {
+  margin-bottom: 1.2rem;
+  font-size: 1.7em;
+  font-weight: 600;
+  color: #f5f5f5;
+  letter-spacing: 0.5px;
+}
+
+/*Buttons*/
+.btn {
+  margin: 1.2rem 0 0.5rem 0;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: .95em;
+  text-transform: uppercase;
+  padding: 0.7em 1.4em;
+  background-color: #ffeba7;
+  color: #5e6681;
+  box-shadow: 0 8px 24px 0 rgb(255 235 167 / 20%);
+  transition: all .3s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-link {
+  color: #f5f5f5;
+  display: block;
+  font-size: .85em;
+  margin-top: 0.5em;
+  transition: color .3s ease-out;
+  text-decoration: none;
+}
+
+/*Hover & focus*/
+.field input:focus::placeholder {
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.btn:hover {
+  background-color: #5e6681;
+  color: #ffeba7;
+  box-shadow: 0 8px 24px 0 rgb(16 39 112 / 20%);
+}
+
+.btn-link:hover {
+  color: #ffeba7;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card {
+    max-width: 98vw;
+    padding: 1.2rem 0.5rem;
+  }
+  .title {
+    font-size: 1.2em;
+  }
+  .btn {
+    font-size: 0.9em;
+    padding: 0.6em 1em;
+  }
+}

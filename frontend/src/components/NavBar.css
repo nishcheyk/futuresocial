@@ -1,0 +1,23 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.navbar-logo {
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #2d2d2d;
+  text-decoration: none;
+}
+.navbar-links a {
+  margin: 0 1rem;
+  color: #444;
+  text-decoration: none;
+}
+.navbar-user {
+  display: flex;
+  align-items: center;
+}
