@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import '../ccss/Profile.module.css';
+import Loader from '../components/Loader';
 
 export default function Profile() {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export default function Profile() {
     }
   };
 
-  if (!userData) return <div>Loading...</div>;
+  if (!userData) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'40vh'}}><Loader /></div>;
 
   return (
     <div className="profile-outer">

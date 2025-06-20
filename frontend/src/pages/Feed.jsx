@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import styles from '../ccss/Feed.module.css';
+import Loader from '../components/Loader';
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
@@ -38,7 +39,7 @@ export default function Feed() {
     setCommentInputs(inputs => ({ ...inputs, [id]: '' }));
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'40vh'}}><Loader /></div>;
 
   return (
     <div className={styles['feed-container']}>
