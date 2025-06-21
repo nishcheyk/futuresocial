@@ -36,6 +36,9 @@
 }
 .profile-form {
   margin-top: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 .field {
   margin-top: .7rem;
@@ -77,6 +80,11 @@
   transition: all .3s ease-in-out;
   cursor: pointer;
 }
+.btn.selected {
+  background: #ffeba7;
+  color: #232946;
+  border: 2px solid #ffeba7;
+}
 .edit-btn {
   margin-top: 1em;
   background-color: #ffeba7;
@@ -110,6 +118,83 @@
   font-size: 1.05em;
   margin-bottom: 1.2em;
   word-break: break-word;
+}
+.profile-form .btn {
+  margin-right: 0.5em;
+}
+.profile-form .btn + .btn {
+  margin-left: 0.5em;
+}
+.profile-form .button-row {
+  display: flex;
+  gap: 1em;
+  margin-top: 0.5em;
+}
+.profile-tabs {
+  display: flex;
+  gap: 1em;
+  margin: 1.2em 0 1.5em 0;
+  justify-content: center;
+}
+.profile-posts-section {
+  margin-top: 2em;
+  background: none;
+}
+.profile-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+.profile-post-card {
+  background: #18191a;
+  border-radius: 10px;
+  padding: 1.1em 1em 0.9em 1em;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  border: 1px solid #23243a;
+  transition: box-shadow .2s;
+  position: relative;
+}
+.profile-post-card:hover {
+  box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+}
+.profile-post-content {
+  font-size: 1.08em;
+  color: #ffeba7;
+  margin-bottom: 0.5em;
+  font-weight: 500;
+}
+.profile-post-image {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.profile-post-meta {
+  font-size: 0.98em;
+  color: #ffe082;
+  margin-top: 0.3em;
+}
+.profile-post-link {
+  display: block;
+  background: #232946;
+  color: #ffeba7;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  margin-bottom: 0.5em;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s;
+}
+.profile-post-link:hover {
+  background: #ffeba7;
+  color: #232946;
+}
+.profile-empty {
+  color: #888;
+  text-align: center;
+  margin: 2em 0;
+  font-size: 1.08em;
 }
 @media (max-width: 600px) {
   .card {

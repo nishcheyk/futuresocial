@@ -1,0 +1,74 @@
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #232946;
+  color: #fff;
+  border-radius: 12px;
+  max-width: 90vw;
+  width: 350px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 1.5em 1em 1em 1em;
+  margin: 1.2rem 0.5rem 0.5rem 0.5rem;
+  position: relative;
+  animation: modalIn 0.2s;
+}
+@keyframes modalIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+}
+.modal-title {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5em;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.modal-list-item {
+  padding: 0.5em 0;
+  border-bottom: 1px solid #393e5c;
+}
+.modal-list-item:last-child {
+  border-bottom: none;
+}
+.modal-list-item a {
+  color: #ffeba7;
+  text-decoration: none;
+  font-weight: 500;
+}
+.modal-content .btn {
+  margin-right: 0.75em;
+}
+.modal-content .btn:last-child {
+  margin-right: 0;
+}
+@media (max-width: 500px) {
+  .modal-content {
+    width: 95vw;
+    padding: 1em 0.5em 0.5em 0.5em;
+  }
+}
