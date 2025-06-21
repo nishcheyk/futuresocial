@@ -9,7 +9,7 @@
 .posts-list {
   margin-top: 1.5rem;
 }
-.post-card {
+.postCard {
   background: #18191a;
   border-radius: 10px;
   margin-bottom: 2rem;
@@ -19,17 +19,17 @@
   transition: box-shadow .2s;
   position: relative;
 }
-.post-card:hover {
+.postCard:hover {
   box-shadow: 0 6px 32px rgba(0,0,0,0.22);
 }
-.post-header {
+.postHeader {
   display: flex;
   align-items: center;
   margin-bottom: 0.7rem;
   gap: 0.7em;
   position: relative;
 }
-.avatar {
+.avatarImg {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -38,13 +38,13 @@
   border: 2px solid #ffeba7;
   background: #fff;
 }
-.post-image {
+.postImage {
   max-width: 100%;
   border-radius: 8px;
   margin-top: 0.7rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
-.post-actions {
+.postActions {
   display: flex;
   flex-wrap: wrap;
   gap: 1.1em;
@@ -55,12 +55,12 @@
 .post-actions-hover {
   display: none;
 }
-.post-card:hover .post-actions-hover {
+.postCard:hover .post-actions-hover {
   display: inline-flex;
   gap: 0.7em;
   align-items: center;
 }
-.post-actions button {
+.postActions button {
   background: #ffeba7;
   color: #5e6681;
   border: none;
@@ -73,10 +73,10 @@
   box-shadow: 0 2px 8px rgba(255,235,167,0.08);
   outline: none;
 }
-.post-actions button:active {
+.postActions button:active {
   box-shadow: 0 1px 2px rgba(255,235,167,0.12);
 }
-.post-actions button.emoji-btn {
+.postActions button.emojiMenuButton {
   background: linear-gradient(135deg, #23243a 60%, #bfa14a 100%);
   color: #ffe082;
   border: 1.5px solid #bfa14a;
@@ -93,26 +93,26 @@
   align-items: center;
   justify-content: center;
 }
-.post-actions button.emoji-btn:hover, .post-actions button.emoji-btn:focus {
+.postActions button.emojiMenuButton:hover, .postActions button.emojiMenuButton:focus {
   background: linear-gradient(135deg, #bfa14a 80%, #ffe082 100%);
   color: #fffbe6;
   transform: scale(1.13);
   box-shadow: 0 4px 16px rgba(255,235,167,0.22);
 }
-.post-actions button.emoji-btn.selected {
+.postActions button.emojiMenuButton.selected {
   background: linear-gradient(135deg, #ffe082 80%, #bfa14a 100%);
   color: #bfa14a;
   border: 2px solid #ffe082;
   transform: scale(1.18);
   box-shadow: 0 4px 16px rgba(255,235,167,0.22);
 }
-.post-actions button.emoji-btn:hover {
+.postActions button.emojiMenuButton:hover {
   background: #ffeba7;
   color: #232946;
   transform: scale(1.08);
   box-shadow: 0 4px 16px rgba(255,235,167,0.18);
 }
-.post-actions .view-count, .post-actions .bookmark-btn {
+.postActions .viewCount, .postActions .bookmark-btn {
   font-size: 1em;
   color: #ffeba7;
   margin-left: 0.5em;
@@ -121,28 +121,32 @@
   cursor: pointer;
   padding: 0;
 }
-.post-actions .bookmark-btn.selected {
+.postActions .bookmark-btn.selected {
   color: #ffe700;
 }
-.comments-section {
+.commentsSection {
   background: #23243a;
   border-radius: 6px;
   padding: 0.8em 1.1em;
   margin-top: 0.7em;
   border: 1px solid #23243a;
 }
-.comment {
+.commentRow {
   color: #f5f5f5;
   font-size: 1.01em;
   margin-bottom: 0.4em;
   word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2em 0;
 }
-.add-comment-form {
+.addCommentForm {
   display: flex;
   gap: 0.5em;
   margin-top: 0.7em;
 }
-.add-comment-form input {
+.addCommentForm input {
   flex: 1;
   padding: 0.5em 0.8em;
   border-radius: 4px;
@@ -151,7 +155,7 @@
   color: #d3d3d3;
   font-size: 1em;
 }
-.add-comment-form button {
+.addCommentForm button {
   background: #ffeba7;
   color: #5e6681;
   border: none;
@@ -161,7 +165,7 @@
   cursor: pointer;
   transition: background .2s, color .2s;
 }
-.add-comment-form button:hover {
+.addCommentForm button:hover {
   background: #5e6681;
   color: #ffeba7;
 }
@@ -172,7 +176,7 @@
   border-radius: 3px;
   padding: 0 0.2em;
 }
-.view-count {
+.viewCount {
   margin-left: auto;
   font-size: 0.98em;
   color: #ffeba7;
@@ -180,7 +184,7 @@
   display: flex;
   align-items: center;
 }
-.comment-like-btn {
+.commentLikeButton {
   background: #23243a;
   color: #ffe082;
   border: none;
@@ -196,28 +200,28 @@
   justify-content: center;
   box-shadow: 0 2px 8px rgba(255,235,167,0.10);
 }
-.comment-like-btn:hover {
+.commentLikeButton:hover {
   background: #ffe082;
   color: #232946;
   transform: scale(1.13);
   box-shadow: 0 4px 16px rgba(255,235,167,0.18);
 }
-.comment-like-btn.liked {
+.commentLikeButton.liked {
   background: #ffe082;
   color: #232946;
   transform: scale(1.18);
   box-shadow: 0 4px 16px rgba(255,235,167,0.22);
 }
-.emoji-trigger {
+.emojiMenuTrigger {
   position: relative;
   display: inline-block;
 }
-.emoji-popover {
+.emojiMenuPopover {
   display: flex;
   position: absolute;
   left: 0;
-  top: 110%;
-  background: #23243a;
+  top: 90%;
+  background: transparent;
   border-radius: 10px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.18);
   padding: 0.5em 0.7em;
@@ -233,13 +237,13 @@
   pointer-events: none;
   visibility: hidden;
 }
-.emoji-trigger:hover .emoji-popover,
-.emoji-trigger:focus-within .emoji-popover,
-.emoji-popover:hover {
+.emojiMenuTrigger:hover .emojiMenuPopover,
+.emojiMenuTrigger:focus-within .emojiMenuPopover,
+.emojiMenuPopover:hover {
   display: flex;
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0.2em) scale(1.04);
+  transform: translateY(0.1em) scale(1.04);
   visibility: visible;
 }
 @media (max-width: 600px) {
@@ -247,19 +251,19 @@
     max-width: 99vw;
     padding: 0.7rem 0.2rem;
   }
-  .post-card {
+  .postCard {
     padding: 0.7rem 0.3rem;
     margin-bottom: 1.1rem;
   }
-  .post-header {
+  .postHeader {
     gap: 0.3em;
   }
-  .avatar {
+  .avatarImg {
     width: 30px;
     height: 30px;
     margin-right: 0.4rem;
   }
-  .post-image {
+  .postImage {
     border-radius: 5px;
   }
 }

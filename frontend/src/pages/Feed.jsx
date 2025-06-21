@@ -81,7 +81,28 @@ export default function Feed() {
     setCommentInputs(inputs => ({ ...inputs, [id]: value }));
   };
 
-  const handleAddComment = async (id) => {
+  const handleLikeComment = async (postId, commentIdx) => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    try {
+      await axios.post(`http://localhost:5000/api/posts/${postId}/comment/${commentIdx}/like`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await fetchPosts();
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setShowLoginPrompt(true);
+      } else {
+        alert('Failed to like comment. Please try again.');
+      }
+    }
+  };
+
+  const handleAddComment = async (id, commentIdx, action) => {
+    if (action === 'likeComment') {
+      await handleLikeComment(id, commentIdx);
+      return;
+    }
     if (!commentInputs[id]) return;
     if (!user) {
       setShowLoginPrompt(true);
@@ -103,24 +124,6 @@ export default function Feed() {
   // Show more/less comments handlers
   const handleShowMoreComments = (postId) => setShowAllComments(s => ({ ...s, [postId]: true }));
   const handleShowLessComments = (postId) => setShowAllComments(s => ({ ...s, [postId]: false }));
-
-  // Add comment like handler
-  const handleLikeComment = async (postId, commentIdx) => {
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
-    try {
-      await axios.post(`http://localhost:5000/api/posts/${postId}/comment/${commentIdx}/like`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-      await fetchPosts();
-    } catch (err) {
-      if (err.response && err.response.status === 401) {
-        setShowLoginPrompt(true);
-      } else {
-        alert('Failed to like comment. Please try again.');
-      }
-    }
-  };
 
   if (loading) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'40vh'}}><Loader /></div>;
 
