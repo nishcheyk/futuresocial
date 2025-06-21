@@ -1,4 +1,4 @@
-// Removed all bookmark logic and UI from Profile.jsx. No further bookmark code remains.
+// Removed all bookmark logic and UI from Profile.jsx. No further bookmark code remains
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import '../ccss/Profile.module.css';
 import '../ccss/Modal.css';
 import Loader from '../components/Loader';
 import Feed from './Feed';
+import FeedPostCard from '../components/FeedPostCard';
 import feedStyles from '../ccss/Feed.module.css';
 
 function Modal({ title, list, onClose }) {
@@ -51,6 +52,9 @@ export default function Profile() {
   const [userPosts, setUserPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [modalOpen, setModalOpen] = useState(null); // 'followers' | 'following' | null
+  const [commentInputs, setCommentInputs] = useState({});
+  const [showAllComments, setShowAllComments] = useState({});
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
@@ -129,37 +133,41 @@ export default function Profile() {
     }
   };
 
+  const handleCommentChange = (postId, value) => {
+    setCommentInputs(inputs => ({ ...inputs, [postId]: value }));
+  };
+  const handleShowMoreComments = postId => {
+    setShowAllComments(prev => ({ ...prev, [postId]: true }));
+  };
+  const handleShowLessComments = postId => {
+    setShowAllComments(prev => ({ ...prev, [postId]: false }));
+  };
+
   // Add dummy handlers for comments to avoid errors (or connect to backend if needed)
-  const handleCommentChange = () => {};
-  const handleAddComment = () => {};
   const handleLike = () => {};
   const handleDislike = () => {};
   const handleEmoji = () => {};
   const handleView = () => {};
 
   // Helper to render a post like in Feed
-  const renderFeedPost = (post) => {
-    const emojiMap = {};
-    (post.emojiReactions || []).forEach(r => { emojiMap[r.emoji] = r.users.length; });
-    const userEmojis = (post.emojiReactions || []).filter(r => r.users.includes(user?.id) || r.users.includes(user?._id)).map(r => r.emoji);
-    return (
-      <div key={post._id} className={feedStyles['post-card']} style={{position:'relative'}}>
-        <div className={feedStyles['post-header']} style={{position:'relative'}}>
-          <img src={post.userId.profilePic || '/default-avatar.png'} alt="avatar" className={feedStyles['avatar']} />
-          <a href={`/profile/${post.userId._id}`}>{post.userId.name}</a>
-          <span style={{position:'absolute', top:0, right:0, fontSize:'1.05em', color:'#ffe082', fontWeight:500, paddingRight:'0.5em'}}>
-            👁 {post.viewCount || 0}
-          </span>
-        </div>
-        <p>{post.content}</p>
-        {post.imageUrl && <img src={post.imageUrl} alt="post" className={feedStyles['post-image']} />}
-        <div className={feedStyles['post-actions']}>
-          <button>👏 {post.likeCount}</button>
-          <button>👎 {post.dislikeCount || 0}</button>
-        </div>
-      </div>
-    );
-  };
+  const renderFeedPost = (post) => (
+    <FeedPostCard
+      key={post._id}
+      post={post}
+      user={user}
+      onLike={handleLike}
+      onDislike={handleDislike}
+      onEmoji={handleEmoji}
+      onView={handleView}
+      onAddComment={() => {}}
+      onCommentChange={handleCommentChange}
+      commentInput={commentInputs[post._id] || ''}
+      showLoginPrompt={showLoginPrompt}
+      setShowLoginPrompt={setShowLoginPrompt}
+      showAllComments={!!showAllComments[post._id]}
+      setShowAllComments={showAllComments[post._id] ? () => handleShowLessComments(post._id) : () => handleShowMoreComments(post._id)}
+    />
+  );
 
   if (!userData) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'40vh'}}><Loader /></div>;
 

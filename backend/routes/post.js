@@ -83,14 +83,11 @@ router.post('/:id/emoji', auth, async (req, res) => {
     if (!post) return res.status(404).json({ message: 'Post not found' });
     let reaction = post.emojiReactions.find(r => r.emoji === emoji);
     if (!reaction) {
-      reaction = { emoji, users: [] };
+      reaction = { emoji, count: 0 };
       post.emojiReactions.push(reaction);
     }
-    if (!reaction.users.map(u => u.toString()).includes(req.user.id)) {
-      reaction.users.push(req.user.id);
-      await post.save();
-      console.log(`[EMOJI] User ${req.user.id} reacted to post ${post._id} with ${emoji}`);
-    }
+    reaction.count = (reaction.count || 0) + 1;
+    await post.save();
     res.json({ emojiReactions: post.emojiReactions });
   } catch (err) {
     console.error('[EMOJI ERROR]', err);
@@ -113,6 +110,43 @@ router.post('/:id/emoji/remove', auth, async (req, res) => {
     res.json({ emojiReactions: post.emojiReactions });
   } catch (err) {
     console.error('[EMOJI REMOVE ERROR]', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add comment to a post
+router.post('/:id/comment', auth, async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) return res.status(400).json({ message: 'Comment text required' });
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    const user = await User.findById(req.user.id);
+    const comment = {
+      user: req.user.id,
+      name: user.name,
+      text,
+      createdAt: new Date()
+    };
+    post.comments.push(comment);
+    await post.save();
+    res.status(201).json({ comments: post.comments });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add comment like endpoint
+router.post('/:postId/comment/:commentIdx/like', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    const idx = parseInt(req.params.commentIdx, 10);
+    if (isNaN(idx) || !post.comments[idx]) return res.status(404).json({ message: 'Comment not found' });
+    post.comments[idx].likes = (post.comments[idx].likes || 0) + 1;
+    await post.save();
+    res.json({ likes: post.comments[idx].likes });
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import styles from '../ccss/Feed.module.css';
 import Loader from '../components/Loader';
+import FeedPostCard from '../components/FeedPostCard';
 
 const EMOJIS = ['👏', '😂', '❤️', '😮', '🔥'];
 
@@ -12,17 +13,19 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [commentInputs, setCommentInputs] = useState({});
-  const [comments, setComments] = useState({}); // local comments for demo
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showAllComments, setShowAllComments] = useState({});
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/posts')
-      .then(res => {
-        setPosts(res.data);
-        setLoading(false);
-      });
+    fetchPosts();
   }, []);
+
+  const fetchPosts = async () => {
+    const res = await axios.get('http://localhost:5000/api/posts');
+    setPosts(res.data);
+    setLoading(false);
+  };
 
   const handleLike = async (id) => {
     if (!user) {
@@ -58,13 +61,12 @@ export default function Feed() {
     }
   };
 
-  const handleEmoji = async (id, emoji, hasReacted) => {
+  const handleEmoji = async (id, key) => {
     if (!user) {
       setShowLoginPrompt(true);
       return;
     }
-    const url = `http://localhost:5000/api/posts/${id}/emoji${hasReacted ? '/remove' : ''}`;
-    await axios.post(url, { emoji }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    await axios.post(`http://localhost:5000/api/posts/${id}/emoji`, { emoji: key }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     // Refetch posts for updated reactions
     const res = await axios.get('http://localhost:5000/api/posts');
     setPosts(res.data);
@@ -79,10 +81,45 @@ export default function Feed() {
     setCommentInputs(inputs => ({ ...inputs, [id]: value }));
   };
 
-  const handleAddComment = (id) => {
+  const handleAddComment = async (id) => {
     if (!commentInputs[id]) return;
-    setComments(c => ({ ...c, [id]: [...(c[id] || []), { text: commentInputs[id], user: user?.name || 'Anonymous' }] }));
-    setCommentInputs(inputs => ({ ...inputs, [id]: '' }));
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    try {
+      await axios.post(`http://localhost:5000/api/posts/${id}/comment`, { text: commentInputs[id] }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      setCommentInputs(inputs => ({ ...inputs, [id]: '' }));
+      await fetchPosts();
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setShowLoginPrompt(true);
+      } else {
+        alert('Failed to add comment. Please try again.');
+      }
+    }
+  };
+
+  // Show more/less comments handlers
+  const handleShowMoreComments = (postId) => setShowAllComments(s => ({ ...s, [postId]: true }));
+  const handleShowLessComments = (postId) => setShowAllComments(s => ({ ...s, [postId]: false }));
+
+  // Add comment like handler
+  const handleLikeComment = async (postId, commentIdx) => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    try {
+      await axios.post(`http://localhost:5000/api/posts/${postId}/comment/${commentIdx}/like`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await fetchPosts();
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setShowLoginPrompt(true);
+      } else {
+        alert('Failed to like comment. Please try again.');
+      }
+    }
   };
 
   if (loading) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'40vh'}}><Loader /></div>;
@@ -114,48 +151,22 @@ export default function Feed() {
       <h2>Global Feed</h2>
       {user && <Link to="/create">Create Post</Link>}
       <div className={styles['posts-list']}>
-        {posts.map(post => {
-          const emojiMap = {};
-          (post.emojiReactions || []).forEach(r => { emojiMap[r.emoji] = r.users.length; });
-          const userEmojis = (post.emojiReactions || []).filter(r => r.users.includes(user?.id) || r.users.includes(user?._id)).map(r => r.emoji);
-          return (
-            <div key={post._id} className={styles['post-card']} onClick={() => handleView(post._id)}>
-              <div className={styles['post-header']}>
-                <img src={post.userId.profilePic || '/default-avatar.png'} alt="avatar" className={styles['avatar']} />
-                <Link to={`/profile/${post.userId._id}`}>{post.userId.name}</Link>
-                <span className={styles['view-count']} style={{marginLeft:'auto',fontSize:'0.98em',color:'#ffeba7'}}>👁 {post.viewCount || 0}</span>
-              </div>
-              <p>{highlightMentions(post.content, post.mentions, post.mentionsUsers)}</p>
-              {post.imageUrl && <img src={post.imageUrl} alt="post" className={styles['post-image']} />}
-              <div className={styles['post-actions']}>
-                <button onClick={e => { e.stopPropagation(); handleLike(post._id); }}>👏 {post.likeCount}</button>
-                <button onClick={e => { e.stopPropagation(); handleDislike(post._id); }}>👎 {post.dislikeCount || 0}</button>
-                <span className={styles['post-actions-hover']}>
-                  {EMOJIS.map(emoji => {
-                    const hasReacted = userEmojis.includes(emoji);
-                    return <button key={emoji} className={styles['emoji-btn'] + (hasReacted ? ' ' + styles['selected'] : '')} onClick={e => { e.stopPropagation(); handleEmoji(post._id, emoji, hasReacted); }}>{emoji} {emojiMap[emoji] || 0}</button>;
-                  })}
-                </span>
-              </div>
-              <div className={styles['comments-section']}>
-                {(comments[post._id] || []).map((c, i) => (
-                  <div key={i} className={styles['comment']}><b>{c.user}:</b> {c.text}</div>
-                ))}
-                {user && (
-                  <form className={styles['add-comment-form']} onSubmit={e => { e.preventDefault(); handleAddComment(post._id); }}>
-                    <input
-                      type="text"
-                      placeholder="Add a comment..."
-                      value={commentInputs[post._id] || ''}
-                      onChange={e => handleCommentChange(post._id, e.target.value)}
-                    />
-                    <button type="submit">Post</button>
-                  </form>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {posts.map(post => (
+          <FeedPostCard
+            key={post._id}
+            post={post}
+            user={user}
+            onLike={handleLike}
+            onDislike={handleDislike}
+            onEmoji={handleEmoji}
+            onView={handleView}
+            onAddComment={handleAddComment}
+            onCommentChange={handleCommentChange}
+            commentInput={commentInputs[post._id] || ''}
+            showAllComments={!!showAllComments[post._id]}
+            setShowAllComments={showAllComments[post._id] ? () => handleShowLessComments(post._id) : () => handleShowMoreComments(post._id)}
+          />
+        ))}
       </div>
     </div>
   );

@@ -77,28 +77,34 @@
   box-shadow: 0 1px 2px rgba(255,235,167,0.12);
 }
 .post-actions button.emoji-btn {
-  background: #fffbe6;
-  color: #232946;
-  border: 1px solid #ffe082;
-  font-size: 1.1em;
+  background: linear-gradient(135deg, #23243a 60%, #bfa14a 100%);
+  color: #ffe082;
+  border: 1.5px solid #bfa14a;
+  font-size: 1.18em;
   padding: 0.18em 0.7em;
   margin-left: 0.18em;
   border-radius: 50%;
-  min-width: 32px;
-  min-height: 32px;
+  min-width: 36px;
+  min-height: 36px;
   line-height: 1.2;
-  box-shadow: 0 2px 8px rgba(255,235,167,0.10);
+  box-shadow: 0 2px 8px rgba(191,161,74,0.13);
   transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.12s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
+.post-actions button.emoji-btn:hover, .post-actions button.emoji-btn:focus {
+  background: linear-gradient(135deg, #bfa14a 80%, #ffe082 100%);
+  color: #fffbe6;
+  transform: scale(1.13);
+  box-shadow: 0 4px 16px rgba(255,235,167,0.22);
+}
 .post-actions button.emoji-btn.selected {
-  background: #ffe082;
-  color: #232946;
-  border: 1.5px solid #ffeba7;
-  transform: scale(1.12);
-  box-shadow: 0 4px 16px rgba(255,235,167,0.18);
+  background: linear-gradient(135deg, #ffe082 80%, #bfa14a 100%);
+  color: #bfa14a;
+  border: 2px solid #ffe082;
+  transform: scale(1.18);
+  box-shadow: 0 4px 16px rgba(255,235,167,0.22);
 }
 .post-actions button.emoji-btn:hover {
   background: #ffeba7;
@@ -173,6 +179,68 @@
   font-weight: 500;
   display: flex;
   align-items: center;
+}
+.comment-like-btn {
+  background: #23243a;
+  color: #ffe082;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1em;
+  padding: 0.22em 0.7em;
+  margin-left: 0.7em;
+  transition: background 0.18s, color 0.18s, transform 0.18s, box-shadow 0.18s;
+  outline: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,235,167,0.10);
+}
+.comment-like-btn:hover {
+  background: #ffe082;
+  color: #232946;
+  transform: scale(1.13);
+  box-shadow: 0 4px 16px rgba(255,235,167,0.18);
+}
+.comment-like-btn.liked {
+  background: #ffe082;
+  color: #232946;
+  transform: scale(1.18);
+  box-shadow: 0 4px 16px rgba(255,235,167,0.22);
+}
+.emoji-trigger {
+  position: relative;
+  display: inline-block;
+}
+.emoji-popover {
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 110%;
+  background: #23243a;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 0.5em 0.7em;
+  z-index: 10;
+  min-width: 220px;
+  min-height: 48px;
+  white-space: nowrap;
+  gap: 0.5em;
+  flex-direction: row;
+  align-items: center;
+  transition: opacity 0.18s, transform 0.18s;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.emoji-trigger:hover .emoji-popover,
+.emoji-trigger:focus-within .emoji-popover,
+.emoji-popover:hover {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0.2em) scale(1.04);
+  visibility: visible;
 }
 @media (max-width: 600px) {
   .feed-container {
