@@ -38,31 +38,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Like (clap) a post
-router.post('/:id/like', auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
-    post.likeCount += 1;
-    await post.save();
-    res.json({ likeCount: post.likeCount });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
-// Dislike a post
-router.post('/:id/dislike', auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
-    post.dislikeCount += 1;
-    await post.save();
-    res.json({ dislikeCount: post.dislikeCount });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 // Increment view count
 router.post('/:id/view', async (req, res) => {
