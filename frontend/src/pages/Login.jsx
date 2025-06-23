@@ -4,6 +4,8 @@ import '../ccss/Login.css';
 import '../ccss/AuthForm.css';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -17,7 +19,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
+      const res = await axios.post(`${API_URL}/api/auth/login`, form);
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/feed');
@@ -27,7 +29,7 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page" style={{display:'flex',justifyContent:'center',alignItems:'center',minHeight:'100vh'}}>
+    <div className="login-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <form className="card login-form" onSubmit={handleSubmit}>
         <div className="title">Login</div>
         <div className="field">
