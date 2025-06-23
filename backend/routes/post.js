@@ -9,7 +9,6 @@ const router = express.Router();
 router.post('/', auth, async (req, res) => {
   try {
     const { content, imageUrl } = req.body;
-    // Extract @mentions
     const mentionUsernames = (content.match(/@\w+/g) || []).map(m => m.slice(1));
     const mentionedUsers = await User.find({ name: { $in: mentionUsernames } });
     const mentions = mentionedUsers.map(u => u._id);
@@ -33,32 +32,6 @@ router.get('/', async (req, res) => {
     }
     const posts = await Post.find().sort({ createdAt: -1 }).populate('userId', 'name profilePic');
     res.json(posts);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Like (clap) a post
-router.post('/:id/like', auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
-    post.likeCount += 1;
-    await post.save();
-    res.json({ likeCount: post.likeCount });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Dislike a post
-router.post('/:id/dislike', auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
-    post.dislikeCount += 1;
-    await post.save();
-    res.json({ dislikeCount: post.dislikeCount });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
