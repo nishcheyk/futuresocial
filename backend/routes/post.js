@@ -31,8 +31,17 @@ router.get('/', async (req, res) => {
       const posts = await Post.find({ _id: { $in: ids } }).populate('userId', 'name profilePic');
       return res.json(posts);
     }
-    const posts = await Post.find().sort({ createdAt: -1 }).populate('userId', 'name profilePic');
-    res.json(posts);
+    // Pagination support
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+    const total = await Post.countDocuments();
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('userId', 'name profilePic');
+    res.json({ posts, total });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

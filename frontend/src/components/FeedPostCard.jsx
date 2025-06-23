@@ -12,7 +12,7 @@ const EMOJIS = [
   { icon: <FaRegSurprise />, label: 'Wow', key: 'wow' }
 ];
 
-export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, onView, onAddComment, onCommentChange, commentInput, showAllComments, setShowAllComments }) {
+export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, onView, onAddComment, onCommentChange, commentInput, showAllComments, setShowAllComments, emojiLoading }) {
   const [showMore, setShowMore] = React.useState(false);
   const commentsToShow = showAllComments ? (post.comments || []) : (post.comments || []).slice(0, 1);
   return (
@@ -34,16 +34,20 @@ export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, o
             aria-label="Like"
             style={{ transition: 'transform 0.18s' }}
             onClick={e => { e.stopPropagation(); onEmoji && onEmoji(post._id, 'like'); }}
+            disabled={emojiLoading}
           >
             <span style={{fontSize:'1.25em',transition:'color 0.18s'}}><FaRegThumbsUp /></span> {post.emojiReactions?.find(r => r.emoji === 'like')?.count || 0}
+            {emojiLoading && <span className={styles.emojiLoadingSpinner} style={{marginLeft:4}}></span>}
           </button>
           <button
             className={styles.emojiMenuButton}
             aria-label="Dislike"
             style={{ transition: 'transform 0.18s', marginLeft: '0.5em' }}
             onClick={e => { e.stopPropagation(); onEmoji && onEmoji(post._id, 'dislike'); }}
+            disabled={emojiLoading}
           >
             <span style={{fontSize:'1.25em',transition:'color 0.18s'}}><FaRegThumbsDown /></span> {post.emojiReactions?.find(r => r.emoji === 'dislike')?.count || 0}
+            {emojiLoading && <span className={styles.emojiLoadingSpinner} style={{marginLeft:4}}></span>}
           </button>
           <div className={styles.emojiMenuPopover}>
             {EMOJIS.filter(e => e.key !== 'like' && e.key !== 'dislike').map(({ icon, label, key }) => (
@@ -53,8 +57,10 @@ export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, o
                 onClick={e => { e.stopPropagation(); onEmoji && onEmoji(post._id, key); }}
                 aria-label={label}
                 style={{ transition: 'transform 0.18s' }}
+                disabled={emojiLoading}
               >
                 <span style={{fontSize:'1.25em',transition:'color 0.18s'}}>{icon}</span> {post.emojiReactions?.find(r => r.emoji === key)?.count || 0}
+                {emojiLoading && <span className={styles.emojiLoadingSpinner} style={{marginLeft:4}}></span>}
               </button>
             ))}
           </div>

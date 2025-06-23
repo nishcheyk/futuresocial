@@ -6,7 +6,7 @@ import '../ccss/Modal.css';
 import Loader from '../components/Loader';
 import FeedPostCard from '../components/FeedPostCard';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Modal({ title, list, onClose }) {
   React.useEffect(() => {
@@ -53,6 +53,7 @@ export default function Profile() {
   const [showAllComments, setShowAllComments] = useState({});
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
+  const [emojiLoading, setEmojiLoading] = useState({});
 
   useEffect(() => {
     let isMounted = true;
@@ -145,9 +146,23 @@ export default function Profile() {
   const handleShowMoreComments = postId => setShowAllComments(prev => ({ ...prev, [postId]: true }));
   const handleShowLessComments = postId => setShowAllComments(prev => ({ ...prev, [postId]: false }));
 
-  const handleLike = () => {};
-  const handleDislike = () => {};
-  const handleEmoji = () => {};
+  const handleEmoji = async (postId, emojiKey) => {
+    if (!user) return setShowLoginPrompt(true);
+    setEmojiLoading(l => ({ ...l, [postId]: true }));
+    try {
+      await axios.post(`${API_URL}/api/posts/${postId}/emoji`, { emoji: emojiKey }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      // Refresh only this user's posts
+      const postsRes = await axios.get(`${API_URL}/api/posts`);
+      setUserPosts(postsRes.data.filter(p => p.userId._id === id || p.userId === id));
+    } catch (err) {
+      setError('Failed to react with emoji.');
+    } finally {
+      setEmojiLoading(l => ({ ...l, [postId]: false }));
+    }
+  };
+
   const handleView = () => {};
 
   const renderFeedPost = (post) => (
@@ -155,8 +170,6 @@ export default function Profile() {
       key={post._id}
       post={post}
       user={user}
-      onLike={handleLike}
-      onDislike={handleDislike}
       onEmoji={handleEmoji}
       onView={handleView}
       onAddComment={() => {}}
@@ -166,6 +179,7 @@ export default function Profile() {
       setShowLoginPrompt={setShowLoginPrompt}
       showAllComments={!!showAllComments[post._id]}
       setShowAllComments={showAllComments[post._id] ? () => handleShowLessComments(post._id) : () => handleShowMoreComments(post._id)}
+      emojiLoading={!!emojiLoading[post._id]}
     />
   );
 
