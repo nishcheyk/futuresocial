@@ -5,8 +5,8 @@ import styles from '../ccss/Feed.module.css';
 import Loader from '../components/Loader';
 import FeedPostCard from '../components/FeedPostCard';
 
-const API_URL = process.env.REACT_APP_API_URL;
-const EMOJIS = ['👏', '😂', '❤️', '😮', '🔥'];
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);

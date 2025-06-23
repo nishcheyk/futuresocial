@@ -4,7 +4,8 @@ import '../ccss/Login.css';
 import '../ccss/AuthForm.css';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
