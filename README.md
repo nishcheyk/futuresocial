@@ -1,35 +1,32 @@
-# FutureSocial Backend
+# FutureSocial
 
-This is the backend for the FutureSocial MERN stack social media platform.
+A modern, Indian-themed social media app with infinite scroll, emoji reactions, following, and more.
 
 ## Features
-- User authentication (JWT-based)
-- User profile CRUD (name, profile picture, bio)
-- Post creation (text/image)
-- Global feed
-- Like (clap) functionality (multiple likes per post, only total count stored)
-- Ready for image upload integration (Cloudinary)
+- Modern React frontend (Vite)
+- Express + MongoDB backend
+- JWT authentication
+- User following/followers
+- Emoji reactions, comments, and post view counts
+- **Infinite Scroll/Paging**: Feed and profile pages load posts as you scroll, using backend pagination (`page` and `limit` query params)
+- **Seeding**: The backend seeding script creates 37 unique Indian users, each with unique avatars, and 2-3 posts per user. About 70% of posts have unique images, and post texts are varied and natural.
 
-## Setup Instructions
-1. Install dependencies:
-   ```sh
-   npm install
-   ```
-2. Copy `.env.example` to `.env` and fill in your MongoDB Atlas and Cloudinary credentials.
-3. Start the server:
-   ```sh
-   npm run dev
-   ```
+## Known Issues
+- When scrolling down, the loader sometimes appears on the right instead of centered. (UI bug)
 
-## API Endpoints
-- `POST /api/auth/signup` - Register new user
-- `POST /api/auth/login` - Login
-- `GET /api/users/:id` - Get user profile
-- `PUT /api/users/:id` - Update user profile
-- `POST /api/posts` - Create post
-- `GET /api/posts` - Get global feed
-- `POST /api/posts/:id/like` - Like (clap) a post
+## Setup
+### Backend
+1. `cd backend`
+2. Install dependencies: `npm install`
+3. Set your MongoDB URI in `.env` as `MONGODB_URI=...` or edit `seed-data.js` directly.
+4. Start the server: `npm start`
+5. (Optional) Seed the database: `node seed-data.js`
+
+### Frontend
+1. `cd frontend`
+2. Install dependencies: `npm install`
+3. Set your backend API URL in `.env` as `VITE_API_URL=...`
+4. Start the frontend: `npm run dev`
 
 ---
-
-Next: I will scaffold the React frontend and connect it to this backend.
+For more, see the code and comments in each file.

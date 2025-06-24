@@ -14,6 +14,8 @@ FutureSocial is a lightweight social media web application built using the MERN 
 - 👥 **Followers System**: Follow/unfollow users and view follower/following lists.
 - 📈 **Post View Count**: Tracks how many times each post has been viewed.
 - 📱 **Responsive UI**: Clean, modular, and responsive design.
+- **Infinite Scroll/Paging**: The feed and profile pages load posts in fragments as you scroll, using the backend's `page` and `limit` query parameters.
+- **Seeding**: The backend seeding script creates 37 unique Indian users, each with unique avatars, and 2-3 posts per user. About 70% of posts have unique images, and post texts are varied and natural.
 
 ---
 
@@ -112,6 +114,7 @@ To deploy to platforms like **Render**, **Vercel**, or **Netlify**:
 - ❌ No image **upload** support; only image **URLs** allowed.
 - 🚫 Emoji reactions are count-based only; not per-user tracking yet.
 - 📱 Some layout issues on very small screens.
+- When scrolling down, the loader sometimes appears on the right instead of centered. (UI bug)
 
 ---
 
