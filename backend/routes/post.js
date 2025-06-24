@@ -73,7 +73,9 @@ router.post('/:id/emoji', auth, async (req, res) => {
     }
     reaction.count = (reaction.count || 0) + 1;
     await post.save();
-    res.json({ emojiReactions: post.emojiReactions });
+
+    const updatedPost = await Post.findById(post._id).populate('userId', 'name profilePic');
+    res.json(updatedPost);
   } catch (err) {
     console.error('[EMOJI ERROR]', err);
     res.status(500).json({ message: err.message });

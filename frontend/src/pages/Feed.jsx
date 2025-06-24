@@ -73,12 +73,10 @@ export default function Feed() {
   const handleEmoji = async (id, key) => {
     if (!user) return setShowLoginPrompt(true);
     try {
-      await axios.post(`${API_URL}/api/posts/${id}/emoji`, { emoji: key }, {
+      const res = await axios.post(`${API_URL}/api/posts/${id}/emoji`, { emoji: key }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      // Refresh only this specific post
-      const postRes = await axios.get(`${API_URL}/api/posts?ids=${id}`);
-      const updatedPost = postRes.data[0];
+      const updatedPost = res.data;
       setPosts(posts => posts.map(post => post._id === id ? updatedPost : post));
     } catch (err) {
       if (err.response?.status === 401) setShowLoginPrompt(true);

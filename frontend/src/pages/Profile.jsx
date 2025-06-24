@@ -190,12 +190,11 @@ export default function Profile() {
     if (!user) return setShowLoginPrompt(true);
     setEmojiLoading(l => ({ ...l, [postId]: true }));
     try {
-      await axios.post(`${API_URL}/api/posts/${postId}/emoji`, { emoji: emojiKey }, {
+      const res = await axios.post(`${API_URL}/api/posts/${postId}/emoji`, { emoji: emojiKey }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      // Refresh only this post in userPosts
-      const postRes = await axios.get(`${API_URL}/api/posts?ids=${postId}`);
-      setUserPosts(posts => posts.map(p => p._id === postId ? postRes.data[0] : p));
+      const updatedPost = res.data;
+      setUserPosts(posts => posts.map(p => p._id === postId ? updatedPost : p));
     } catch (err) {
       setError('Failed to react with emoji.');
     } finally {
