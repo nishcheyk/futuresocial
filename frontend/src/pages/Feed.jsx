@@ -207,7 +207,7 @@ export default function Feed() {
           />
         ))}
         {loadingMore && (
-          <div style={{ textAlign: 'center', margin: '2em' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '2em' }}>
             <Loader />
           </div>
         )}

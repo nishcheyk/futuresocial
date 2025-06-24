@@ -300,7 +300,7 @@ export default function Profile() {
           ) : (
             <div className="profile-posts-list">
               {userPosts.map(post => renderFeedPost(post))}
-              {loadingMore && <div style={{ textAlign: 'center', margin: '1em' }}><Loader /></div>}
+              {loadingMore && <div style={{ display: 'flex', justifyContent: 'center', margin: '1em' }}><Loader /></div>}
               {!hasMore && userPosts.length > 0 && <div style={{ textAlign: 'center', color: '#888', margin: '1em' }}>No more posts.</div>}
             </div>
           )}
