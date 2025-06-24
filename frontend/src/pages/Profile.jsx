@@ -47,6 +47,9 @@ export default function Profile() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [userPosts, setUserPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [modalOpen, setModalOpen] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
@@ -66,36 +69,73 @@ export default function Profile() {
         setBioCount(userRes.data.bio ? userRes.data.bio.length : 0);
         setBadges(userRes.data.badges || []);
         setIsFollowing((userRes.data.followers || []).includes(user?.id) || (userRes.data.followers || []).includes(user?._id));
-      } catch {
-        setError('Could not load user profile. Network error.');
+      } catch (err) {
+        if (err.response?.status === 404) {
+          setError('User not found.');
+        } else {
+          setError('Could not load user profile. Network error.');
+        }
       }
 
       try {
         const followersRes = await axios.get(`${API_URL}/api/users/${id}/followers`);
         if (isMounted) setFollowers(followersRes.data);
-      } catch {
+      } catch (err) {
         if (isMounted) setFollowers([]);
       }
 
       try {
         const followingRes = await axios.get(`${API_URL}/api/users/${id}/following`);
         if (isMounted) setFollowing(followingRes.data);
-      } catch {
+      } catch (err) {
         if (isMounted) setFollowing([]);
       }
 
+      // Initial posts load
       try {
-        const postsRes = await axios.get(`${API_URL}/api/posts`);
-        if (isMounted) {
-          setUserPosts(postsRes.data.filter(p => p.userId._id === id || p.userId === id));
-        }
+        setLoadingMore(true);
+        const postsRes = await axios.get(`${API_URL}/api/posts?page=1&limit=10`);
+        const filtered = postsRes.data.posts.filter(p => p.userId._id === id || p.userId === id);
+        setUserPosts(filtered);
+        setHasMore(filtered.length >= 10);
+        setPage(2);
       } catch {
-        if (isMounted) setUserPosts([]);
+        setUserPosts([]);
+        setHasMore(false);
+      } finally {
+        setLoadingMore(false);
       }
     };
     fetchData();
     return () => { isMounted = false; };
   }, [id]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
+      if (window.innerHeight + document.documentElement.scrollTop + 200 >= document.documentElement.offsetHeight) {
+        loadMorePosts();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  });
+
+  const loadMorePosts = async () => {
+    setLoadingMore(true);
+    try {
+      const postsRes = await axios.get(`${API_URL}/api/posts?page=${page}&limit=10`);
+      const filtered = postsRes.data.posts.filter(p => p.userId._id === id || p.userId === id);
+      setUserPosts(prev => [...prev, ...filtered]);
+      setHasMore(filtered.length >= 10);
+      setPage(prev => prev + 1);
+    } catch {
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -153,9 +193,9 @@ export default function Profile() {
       await axios.post(`${API_URL}/api/posts/${postId}/emoji`, { emoji: emojiKey }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      // Refresh only this user's posts
-      const postsRes = await axios.get(`${API_URL}/api/posts`);
-      setUserPosts(postsRes.data.filter(p => p.userId._id === id || p.userId === id));
+      // Refresh only this post in userPosts
+      const postRes = await axios.get(`${API_URL}/api/posts?ids=${postId}`);
+      setUserPosts(posts => posts.map(p => p._id === postId ? postRes.data[0] : p));
     } catch (err) {
       setError('Failed to react with emoji.');
     } finally {
@@ -184,6 +224,14 @@ export default function Profile() {
   );
 
   if (!userData) {
+    if (error && error.includes('not found')) {
+      return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2>User Not Found</h2>
+          <p>The user you're looking for doesn't exist.</p>
+        </div>
+      </div>;
+    }
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}><Loader /></div>;
   }
 
@@ -252,6 +300,8 @@ export default function Profile() {
           ) : (
             <div className="profile-posts-list">
               {userPosts.map(post => renderFeedPost(post))}
+              {loadingMore && <div style={{ textAlign: 'center', margin: '1em' }}><Loader /></div>}
+              {!hasMore && userPosts.length > 0 && <div style={{ textAlign: 'center', color: '#888', margin: '1em' }}>No more posts.</div>}
             </div>
           )}
         </div>

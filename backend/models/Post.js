@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
   imageUrl: { type: String, default: '' },
   viewCount: { type: Number, default: 0 },
   mentions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  
+
   emojiReactions: [{ emoji: String, count: { type: Number, default: 0 } }],
   // Comments: { user: ObjectId, name: String, text: String, createdAt: Date }
   comments: [{
@@ -17,5 +17,8 @@ const postSchema = new mongoose.Schema({
     likes: { type: Number, default: 0 }
   }]
 }, { timestamps: true });
+
+// Add unique compound index to prevent duplicate posts
+postSchema.index({ userId: 1, content: 1 }, { unique: true });
 
 export default mongoose.model('Post', postSchema);

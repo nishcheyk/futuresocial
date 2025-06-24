@@ -7,10 +7,12 @@ import FeedPostCard from '../components/FeedPostCard';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-
 export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [commentInputs, setCommentInputs] = useState({});
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showAllComments, setShowAllComments] = useState({});
@@ -20,52 +22,79 @@ export default function Feed() {
     fetchPosts();
   }, []);
 
-  const fetchPosts = async () => {
-    const res = await axios.get(`${API_URL}/api/posts`);
-    setPosts(res.data);
-    setLoading(false);
-  };
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
+      if (window.innerHeight + document.documentElement.scrollTop + 200 >= document.documentElement.offsetHeight) {
+        loadMorePosts();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  });
 
-  const handleLike = async (id) => {
-    if (!user) return setShowLoginPrompt(true);
+  const fetchPosts = async () => {
     try {
-      await axios.post(`${API_URL}/api/posts/${id}/like`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setPosts(posts => posts.map(post => post._id === id ? { ...post, likeCount: post.likeCount + 1 } : post));
+      setLoading(true);
+      const res = await axios.get(`${API_URL}/api/posts?page=1&limit=20`);
+      setPosts(res.data.posts || res.data);
+      setHasMore((res.data.posts || res.data).length >= 20);
+      setPage(2);
     } catch (err) {
-      if (err.response?.status === 401) setShowLoginPrompt(true);
-      else alert('Failed to like post. Please try again.');
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDislike = async (id) => {
-    if (!user) return setShowLoginPrompt(true);
+  const loadMorePosts = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
     try {
-      await axios.post(`${API_URL}/api/posts/${id}/dislike`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setPosts(posts => posts.map(post => post._id === id ? { ...post, dislikeCount: (post.dislikeCount || 0) + 1 } : post));
+      const res = await axios.get(`${API_URL}/api/posts?page=${page}&limit=20`);
+      const newPosts = res.data.posts || res.data;
+
+      // Filter out duplicates based on post ID
+      const existingIds = new Set(posts.map(post => post._id));
+      const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post._id));
+
+      setPosts(prev => [...prev, ...uniqueNewPosts]);
+      setHasMore(uniqueNewPosts.length >= 20);
+      setPage(prev => prev + 1);
     } catch (err) {
-      if (err.response?.status === 401) setShowLoginPrompt(true);
-      else alert('Failed to dislike post. Please try again.');
+      console.error('Error loading more posts:', err);
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
   const handleEmoji = async (id, key) => {
     if (!user) return setShowLoginPrompt(true);
-    await axios.post(`${API_URL}/api/posts/${id}/emoji`, { emoji: key }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    const res = await axios.get(`${API_URL}/api/posts`);
-    setPosts(res.data);
+    try {
+      await axios.post(`${API_URL}/api/posts/${id}/emoji`, { emoji: key }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      // Refresh only this specific post
+      const postRes = await axios.get(`${API_URL}/api/posts?ids=${id}`);
+      const updatedPost = postRes.data[0];
+      setPosts(posts => posts.map(post => post._id === id ? updatedPost : post));
+    } catch (err) {
+      if (err.response?.status === 401) setShowLoginPrompt(true);
+      else alert('Failed to react with emoji. Please try again.');
+    }
   };
 
   const handleView = async (id) => {
-    await axios.post(`${API_URL}/api/posts/${id}/view`);
-    setPosts(posts => posts.map(post => post._id === id ? {
-      ...post, viewCount: (post.viewCount || 0) + 1
-    } : post));
+    try {
+      await axios.post(`${API_URL}/api/posts/${id}/view`);
+      setPosts(posts => posts.map(post => post._id === id ? {
+        ...post, viewCount: (post.viewCount || 0) + 1
+      } : post));
+    } catch (err) {
+      console.error('Error updating view count:', err);
+    }
   };
 
   const handleCommentChange = (id, value) => {
@@ -78,7 +107,10 @@ export default function Feed() {
       await axios.post(`${API_URL}/api/posts/${postId}/comment/${commentIdx}/like`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      await fetchPosts();
+      // Refresh only this specific post
+      const postRes = await axios.get(`${API_URL}/api/posts?ids=${postId}`);
+      const updatedPost = postRes.data[0];
+      setPosts(posts => posts.map(post => post._id === postId ? updatedPost : post));
     } catch (err) {
       if (err.response?.status === 401) setShowLoginPrompt(true);
       else alert('Failed to like comment. Please try again.');
@@ -96,7 +128,10 @@ export default function Feed() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setCommentInputs(inputs => ({ ...inputs, [id]: '' }));
-      await fetchPosts();
+      // Refresh only this specific post
+      const postRes = await axios.get(`${API_URL}/api/posts?ids=${id}`);
+      const updatedPost = postRes.data[0];
+      setPosts(posts => posts.map(post => post._id === id ? updatedPost : post));
     } catch (err) {
       if (err.response?.status === 401) setShowLoginPrompt(true);
       else alert('Failed to add comment. Please try again.');
@@ -160,8 +195,6 @@ export default function Feed() {
             key={post._id}
             post={post}
             user={user}
-            onLike={handleLike}
-            onDislike={handleDislike}
             onEmoji={handleEmoji}
             onView={handleView}
             onAddComment={handleAddComment}
@@ -173,6 +206,16 @@ export default function Feed() {
               : () => handleShowMoreComments(post._id)}
           />
         ))}
+        {loadingMore && (
+          <div style={{ textAlign: 'center', margin: '2em' }}>
+            <Loader />
+          </div>
+        )}
+        {!hasMore && posts.length > 0 && (
+          <div style={{ textAlign: 'center', color: '#888', margin: '2em' }}>
+            No more posts to load.
+          </div>
+        )}
       </div>
     </div>
   );
