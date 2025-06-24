@@ -18,8 +18,8 @@ export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, o
   return (
     <div className={styles.postCard} onClick={() => onView && onView(post._id)}>
       <div className={styles.postHeader}>
-        <img src={post.userId.profilePic || '/default-avatar.png'} alt="avatar" className={styles.avatarImg} />
-        <Link to={`/profile/${post.userId._id}`}>{post.userId.name}</Link>
+        <img src={(post.userId && post.userId.profilePic) ? post.userId.profilePic : '/default-avatar.png'} alt="avatar" className={styles.avatarImg} />
+        <Link to={post.userId ? `/profile/${post.userId._id}` : '#'}>{post.userId ? post.userId.name : 'Unknown User'}</Link>
         <span className={styles.viewCount} style={{marginLeft:'auto',fontSize:'0.98em',color:'#ffeba7'}}>👁 {post.viewCount || 0}</span>
       </div>
       <p>{post.content}</p>

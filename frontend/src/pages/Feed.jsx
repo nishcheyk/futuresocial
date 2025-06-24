@@ -11,7 +11,7 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1profile);
   const [hasMore, setHasMore] = useState(true);
   const [commentInputs, setCommentInputs] = useState({});
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
