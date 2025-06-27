@@ -15,6 +15,7 @@ FutureSocial is a lightweight, Indian-themed social media web application built 
 - 📈 **Post View Count**: Tracks how many times each post has been viewed.
 - **Infinite Scroll/Paging (Post Fragmentation)**: The feed and profile pages load posts in fragments as you scroll, using the backend's `page` and `limit` query parameters for efficient pagination.
 - 📱 **Responsive UI**: Clean, modular, and responsive design.
+- **@ Mentions**: Mention users in posts using @username syntax with autocomplete suggestions.
 
 ---
 

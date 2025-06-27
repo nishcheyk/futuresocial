@@ -12,6 +12,17 @@ const EMOJIS = [
   { icon: <FaRegSurprise />, label: 'Wow', key: 'wow' }
 ];
 
+const highlightMentions = (text, mentions) => {
+  if (!mentions || mentions.length === 0) return text;
+  let result = text;
+  mentions.forEach(user => {
+    if (user && user.name) {
+      result = result.replace(new RegExp(`@${user.name}`, 'g'), `<b style="color:#ffeba7">@${user.name}</b>`);
+    }
+  });
+  return <span dangerouslySetInnerHTML={{ __html: result }} />;
+};
+
 export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, onView, onAddComment, onCommentChange, commentInput, showAllComments, setShowAllComments, emojiLoading }) {
   const [showMore, setShowMore] = React.useState(false);
   const commentsToShow = showAllComments ? (post.comments || []) : (post.comments || []).slice(0, 1);
@@ -22,7 +33,7 @@ export default function FeedPostCard({ post, user, onLike, onDislike, onEmoji, o
         <Link to={post.userId ? `/profile/${post.userId._id}` : '#'}>{post.userId ? post.userId.name : 'Unknown User'}</Link>
         <span className={styles.viewCount} style={{marginLeft:'auto',fontSize:'0.98em',color:'#ffeba7'}}>👁 {post.viewCount || 0}</span>
       </div>
-      <p>{post.content}</p>
+      <p>{highlightMentions(post.content, post.mentions)}</p>
       {post.imageUrl && <img src={post.imageUrl} alt="post" className={styles.postImage} />}
       <div className={styles.postActions}>
         <div

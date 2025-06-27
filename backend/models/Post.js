@@ -8,7 +8,7 @@ const postSchema = new mongoose.Schema({
   mentions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
   emojiReactions: [{ emoji: String, count: { type: Number, default: 0 } }],
-  // Comments: { user: ObjectId, name: String, text: String, createdAt: Date }
+
   comments: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     name: String,

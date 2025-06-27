@@ -105,7 +105,7 @@ export default function Feed() {
       await axios.post(`${API_URL}/api/posts/${postId}/comment/${commentIdx}/like`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      // Refresh only this specific post
+
       const postRes = await axios.get(`${API_URL}/api/posts?ids=${postId}`);
       const updatedPost = postRes.data[0];
       setPosts(posts => posts.map(post => post._id === postId ? updatedPost : post));
@@ -138,15 +138,6 @@ export default function Feed() {
 
   const handleShowMoreComments = postId => setShowAllComments(s => ({ ...s, [postId]: true }));
   const handleShowLessComments = postId => setShowAllComments(s => ({ ...s, [postId]: false }));
-
-  const highlightMentions = (text, mentions, users) => {
-    if (!mentions || !users) return text;
-    let result = text;
-    users.forEach(u => {
-      result = result.replace(new RegExp(`@${u.name}`, 'g'), `<b style="color:#ffeba7">@${u.name}</b>`);
-    });
-    return <span dangerouslySetInnerHTML={{ __html: result }} />;
-  };
 
   if (loading) {
     return (
@@ -218,3 +209,4 @@ export default function Feed() {
     </div>
   );
 }
+

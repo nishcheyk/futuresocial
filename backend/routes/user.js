@@ -82,6 +82,27 @@ router.get('/:id/following', async (req, res) => {
   }
 });
 
+// Search users for mentions
+router.get('/search/mentions', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.length < 2) {
+      return res.json([]);
+    }
+
+    const users = await User.find({
+      name: { $regex: q, $options: 'i' }
+    })
+    .select('name profilePic')
+    .limit(10);
+
+    res.json(users);
+  } catch (err) {
+    console.error('[USER SEARCH ERROR]', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Award a badge (admin or self for demo)
 router.post('/:id/badge', auth, async (req, res) => {
   try {

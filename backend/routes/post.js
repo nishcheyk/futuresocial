@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/', auth, async (req, res) => {
   try {
     const { content, imageUrl } = req.body;
-    // Extract @mentions
+
     const mentionUsernames = (content.match(/@\w+/g) || []).map(m => m.slice(1));
     const mentionedUsers = await User.find({ name: { $in: mentionUsernames } });
     const mentions = mentionedUsers.map(u => u._id);
@@ -28,7 +28,9 @@ router.get('/', async (req, res) => {
   try {
     if (req.query.ids) {
       const ids = req.query.ids.split(',');
-      const posts = await Post.find({ _id: { $in: ids } }).populate('userId', 'name profilePic');
+      const posts = await Post.find({ _id: { $in: ids } })
+        .populate('userId', 'name profilePic')
+        .populate('mentions', 'name profilePic');
       return res.json(posts);
     }
     // Pagination support
@@ -40,7 +42,8 @@ router.get('/', async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('userId', 'name profilePic');
+      .populate('userId', 'name profilePic')
+      .populate('mentions', 'name profilePic');
     res.json({ posts, total });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -68,13 +71,16 @@ router.post('/:id/emoji', auth, async (req, res) => {
     if (!post) return res.status(404).json({ message: 'Post not found' });
     let reaction = post.emojiReactions.find(r => r.emoji === emoji);
     if (!reaction) {
-      reaction = { emoji, count: 0 };
-      post.emojiReactions.push(reaction);
+      post.emojiReactions.push({ emoji, count: 1 });
+    } else {
+      reaction.count = (reaction.count || 0) + 1;
     }
-    reaction.count = (reaction.count || 0) + 1;
+    post.markModified('emojiReactions');
     await post.save();
 
-    const updatedPost = await Post.findById(post._id).populate('userId', 'name profilePic');
+    const updatedPost = await Post.findById(post._id)
+      .populate('userId', 'name profilePic')
+      .populate('mentions', 'name profilePic');
     res.json(updatedPost);
   } catch (err) {
     console.error('[EMOJI ERROR]', err);
